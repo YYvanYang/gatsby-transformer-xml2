@@ -1,0 +1,22 @@
+{
+  "name": "gatsby-transformer-xml2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "babel src --out-dir . --ignore **/__tests__",
+    "prepare": "cross-env NODE_ENV=production npm run build"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.7.4",
+    "fast-xml-parser": "^3.15.0",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "babel-preset-gatsby-package": "^0.2.12",
+    "cross-env": "^6.0.3"
+  }
+}
