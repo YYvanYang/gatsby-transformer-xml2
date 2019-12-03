@@ -1,10 +1,10 @@
 {
-  "name": "gatsby-transformer-xml2",
+  "name": "gatsby-transformer-voaxml",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "babel src --out-dir . --ignore **/__tests__",
+    "build": "babel src --out-dir .",
     "prepare": "cross-env NODE_ENV=production npm run build"
   },
   "dependencies": {

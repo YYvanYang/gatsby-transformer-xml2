@@ -1,27 +1,27 @@
 const parser = require('fast-xml-parser');
 const _ = require(`lodash`);
+const fs = require('fs');
 
 // todo: move this options to plugin config file
 const options = {
   allowBooleanAttributes: false,
-  attrNodeName: false,
-  attributeNamePrefix: '@_',
-  cdataPositionChar: 'c',
+  attrNodeName: "attr",
+  attributeNamePrefix: "@_",
+  cdataPositionChar: "\c",
   cdataTagName: false,
   decodeHTMLchar: false,
-  ignoreAttributes: true,
+  ignoreAttributes: false,
   ignoreNameSpace: false,
-  localeRange: '',
+  localeRange: "",
   parseAttributeValue: undefined,
   parseNodeValue: true,
-  textNodeName: '#text',
+  textNodeName: "#text",
   trimValues: true
 };
 
 async function onCreateNode({
   node,
   actions,
-  loadNodeContent,
   createNodeId,
   createContentDigest
 }) {
@@ -32,22 +32,47 @@ async function onCreateNode({
 
   const { createNode, createParentChildLink } = actions;
 
-  const content = await loadNodeContent(node);
-  const parsedContent = parser.parse(content, options);
+  // const content = await loadNodeContent(node);
 
-  if (
-    !parsedContent.Presentation ||
-    !Array.isArray(parsedContent.Presentation.Slides)
-  ) {
+  const parsedContent = await readFile(node.absolutePath)
+
+  if (!parsedContent.Presentation || !parsedContent.Presentation.Slides || !Array.isArray(parsedContent.Presentation.Slides.Slide)) {
     return;
   }
 
-  parsedContent.Presentation.Slides.forEach((obj, i) => {
-    transformObject(
-      obj,
-      obj.id ? obj.id : createNodeId(`${node.id} [${i}] >>> XML`)
-    );
+  parsedContent.Presentation.Slides.Slide.forEach((obj, i) => {
+    transformObject(obj, objId(obj, i));
   });
+
+
+  function readFile(filepath) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(
+        filepath,
+        'utf16le',
+        (err, xmlData) => {
+          if (err) reject(err);
+
+          const parsedContent = parser.parse(xmlData, options);
+          resolve(parsedContent)
+        }
+      );
+    })
+  }
+
+  function objId(obj, i) {
+    if (obj.id) {
+      return obj.id;
+    }
+
+    if (obj.attr) {
+      if (obj.attr["@_id"]) {
+        return obj.attr["@_id"]
+      }
+    }
+
+    return createNodeId(`${node.id} [${i}] >>> XML`)
+  }
 
   function transformObject(obj, id) {
     const xmlNode = {
@@ -60,6 +85,7 @@ async function onCreateNode({
         type: _.upperFirst(_.camelCase(`${node.name} xml`))
       }
     };
+    console.log('xmlNode', xmlNode)
     createNode(xmlNode);
     createParentChildLink({ parent: node, child: xmlNode });
   }
