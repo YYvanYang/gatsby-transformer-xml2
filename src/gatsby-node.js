@@ -73,9 +73,11 @@ async function onCreateNode({
   }
 
   function transformObject(obj, id) {
+    const letter = node.relativePath.split('/')[0]
     const xmlNode = {
       ...obj,
       id,
+      letter,
       children: [],
       parent: node.id,
       internal: {
