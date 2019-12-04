@@ -41,7 +41,8 @@ async function onCreateNode({
   }
 
   parsedContent.Presentation.Slides.Slide.forEach((obj, i) => {
-    transformObject(obj, objId(obj, i));
+    const id = objId(obj, i) + node.id
+    transformObject(obj, id);
   });
 
 
@@ -61,10 +62,7 @@ async function onCreateNode({
   }
 
   function objId(obj, i) {
-    if (obj.id) {
-      return obj.id;
-    }
-
+   
     if (obj.attr) {
       if (obj.attr["@_id"]) {
         return obj.attr["@_id"]
@@ -85,7 +83,6 @@ async function onCreateNode({
         type: _.upperFirst(_.camelCase(`${node.name} xml`))
       }
     };
-    console.log('xmlNode', xmlNode)
     createNode(xmlNode);
     createParentChildLink({ parent: node, child: xmlNode });
   }
