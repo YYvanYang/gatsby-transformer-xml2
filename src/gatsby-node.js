@@ -36,15 +36,22 @@ async function onCreateNode({
 
   const parsedContent = await readFile(node.absolutePath)
 
-  if (!parsedContent.Presentation || !parsedContent.Presentation.Slides || !Array.isArray(parsedContent.Presentation.Slides.Slide)) {
+  if (!parsedContent.Presentation || !parsedContent.Presentation.Slides) {
     return;
   }
 
-  parsedContent.Presentation.Slides.Slide.forEach((obj, i) => {
-    const id = objId(obj, i) + node.id
-    transformObject(obj, id);
-  });
-
+  if (Array.isArray(parsedContent.Presentation.Slides.Slide)) {
+    parsedContent.Presentation.Slides.Slide.forEach((obj, i) => {
+      const id = objId(obj, i) + node.id
+      transformObject(obj, id);
+    });
+  } else if (typeof parsedContent.Presentation.Slides.Slide !== null && 
+    typeof parsedContent.Presentation.Slides.Slide === "object") {
+      const id = objId(obj, 0) + node.id
+      transformObject(obj, id);
+  } else {
+    return;
+  }
 
   function readFile(filepath) {
     return new Promise((resolve, reject) => {
