@@ -40,15 +40,17 @@ async function onCreateNode({
     return;
   }
 
-  if (Array.isArray(parsedContent.Presentation.Slides.Slide)) {
-    parsedContent.Presentation.Slides.Slide.forEach((obj, i) => {
+  const slide = parsedContent.Presentation.Slides.Slide
+
+  if (Array.isArray(slide)) {
+    slide.forEach((obj, i) => {
       const id = objId(obj, i) + node.id
       transformObject(obj, id);
     });
-  } else if (typeof parsedContent.Presentation.Slides.Slide !== null && 
-    typeof parsedContent.Presentation.Slides.Slide === "object") {
-      const id = objId(obj, 0) + node.id
-      transformObject(obj, id);
+  } else if (typeof slide !== null && 
+    typeof slide === "object") {
+      const id = objId(slide, 0) + node.id
+      transformObject(slide, id);
   } else {
     return;
   }
